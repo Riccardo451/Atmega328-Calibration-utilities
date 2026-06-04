@@ -1,18 +1,40 @@
+#define CAL_CLOCK_FREQ 15999402ULL
+
 #include "CalibratedClock.h"
+
+uint64_t heartbeat;
 
 void setup()
 {
-    CalClock.begin(15999402UL);
+    Serial.begin(115200);
+
+    CalibratedClock::begin();
+
+    heartbeat = CalibratedClock::millis();
+
+    Serial.println();
+    Serial.println(F("Calibrated Clock"));
+
+    Serial.print(F("Frequency: "));
+    Serial.println(
+        (unsigned long)
+        CalibratedClock::frequency());
+
+    Serial.print(F("PPM: "));
+    Serial.println(
+        CalibratedClock::ppmError(),
+        3);
 }
 
 void loop()
 {
-    static uint64_t last = 0;
-
-    if (CalClock.elapsedMs(last) >= 1000)
+    if (CalibratedClock::everyMillis(
+            heartbeat,
+            1000))
     {
-        last = CalClock.millis();
-
-        Serial.println(CalClock.millis());
+        Serial.print(F("ms = "));
+        Serial.println(
+            (unsigned long long)
+            CalibratedClock::millis());
     }
 }
